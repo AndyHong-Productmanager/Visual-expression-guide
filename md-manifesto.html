@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>.md 선언문 — AI가 읽는 문서의 시대</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@400;600&family=Gowun+Batang:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a0a;
+    --paper: #f4f1ea;
+    --rule: #1a1a1a;
+    --accent: #d63b1f;
+    --muted: #6b6358;
+    --code-bg: #15130f;
+    --code-fg: #e8e2d4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Gowun Batang', 'Fraunces', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(214,59,31,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(10,10,10,0.05) 0%, transparent 50%);
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    z-index: 100;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+  }
+
+  /* Masthead */
+  .masthead {
+    border-top: 6px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 18px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .masthead .vol { font-weight: 600; }
+  .masthead .date { color: var(--muted); }
+
+  /* Hero */
+  .hero {
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--ink);
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    margin-bottom: 24px;
+    display: inline-block;
+    padding: 4px 0;
+    border-bottom: 1.5px solid var(--accent);
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(48px, 9vw, 116px);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    margin-bottom: 32px;
+    font-variation-settings: "opsz" 144;
+  }
+
+  h1 .dot {
+    color: var(--accent);
+    font-style: italic;
+    font-weight: 300;
+  }
+
+  h1 .stroke {
+    -webkit-text-stroke: 2px var(--ink);
+    color: transparent;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .lede {
+    font-family: 'Gowun Batang', serif;
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.5;
+    max-width: 680px;
+    color: var(--ink);
+  }
+
+  .lede strong {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1px 8px;
+    font-weight: 700;
+  }
+
+  /* Section */
+  section {
+    padding: 70px 0;
+    border-bottom: 1px solid rgba(10,10,10,0.15);
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(32px, 4.5vw, 52px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 36px;
+    max-width: 18ch;
+  }
+
+  h2 em {
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  p { margin-bottom: 1.2em; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Argument list */
+  .args {
+    list-style: none;
+    counter-reset: arg;
+  }
+
+  .args li {
+    counter-increment: arg;
+    padding: 28px 0 28px 80px;
+    border-top: 1px dashed rgba(10,10,10,0.25);
+    position: relative;
+    font-size: 19px;
+    line-height: 1.65;
+  }
+
+  .args li:last-child { border-bottom: 1px dashed rgba(10,10,10,0.25); }
+
+  .args li::before {
+    content: counter(arg, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .args li b {
+    display: block;
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  /* Quote / pull */
+  .pull {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 3.8vw, 44px);
+    line-height: 1.2;
+    font-weight: 400;
+    font-style: italic;
+    padding: 60px 0;
+    border-top: 3px double var(--ink);
+    border-bottom: 3px double var(--ink);
+    margin: 60px 0;
+    text-align: center;
+    letter-spacing: -0.015em;
+  }
+
+  .pull span { color: var(--accent); }
+
+  /* Code blocks */
+  .example {
+    margin: 40px 0;
+  }
+
+  .example-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .example-label::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .example-label .tag {
+    background: var(--accent);
+    color: var(--paper);
+    padding: 2px 8px;
+    font-weight: 600;
+  }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 28px 32px;
+    border-radius: 2px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    border-left: 4px solid var(--accent);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+
+  pre code .h { color: #ff9a76; font-weight: 600; }
+  pre code .k { color: #f5d76e; }
+  pre code .c { color: #7a8f7a; font-style: italic; }
+  pre code .s { color: #b8d4a8; }
+  pre code .b { color: #e8e2d4; font-weight: 600; }
+
+  /* Comparison table */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 2px solid var(--ink);
+    margin: 40px 0;
+  }
+
+  .compare > div {
+    padding: 30px;
+  }
+
+  .compare .old {
+    background: rgba(10,10,10,0.04);
+    border-right: 2px solid var(--ink);
+  }
+
+  .compare .new {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .compare h3 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .compare ul {
+    list-style: none;
+  }
+
+  .compare li {
+    padding: 8px 0;
+    font-size: 16px;
+    font-family: 'Gowun Batang', serif;
+  }
+
+  .compare .old li { text-decoration: line-through; opacity: 0.55; }
+  .compare .new li::before { content: '→ '; color: var(--accent); font-weight: 700; }
+
+  /* Footer */
+  footer {
+    padding: 60px 0 0;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+
+  footer .sig {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 22px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 700px) {
+    .wrap { padding: 40px 24px 80px; }
+    .compare { grid-template-columns: 1fr; }
+    .compare .old { border-right: none; border-bottom: 2px solid var(--ink); }
+    .args li { padding-left: 0; padding-top: 50px; }
+    .args li::before { top: 24px; }
+    pre { font-size: 12px; padding: 20px; box-shadow: 4px 4px 0 var(--ink); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="vol">VOL.001 · AI-NATIVE OFFICE</span>
+    <span class="date">2026 · APRIL · 編</span>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">A Manifesto / 사내 문서 정책</span>
+    <h1>닷<span class="dot">.</span>md<br><span class="stroke">선언문</span></h1>
+    <p class="lede">회사 문서는 모두 <strong>.md</strong>로 통일한다. <br>중요한 건 내가 읽는 게 아니다 — <strong>AI가 읽는 것</strong>이다.</p>
+  </header>
+
+  <section>
+    <div class="section-num">§ 01 — 원칙</div>
+    <h2>문서는 더 이상 <em>사람을 위한 것</em>이 아니다.</h2>
+    <p>지난 30년간 사무실 문서는 사람이 읽기 위해 만들어졌다. 표지가 있고, 폰트가 있고, 로고가 박혀 있었다. 이제 그 시대는 끝났다. 문서를 가장 많이, 가장 빠르게, 가장 정확하게 읽는 독자는 AI다. 그렇다면 문서의 포맷도 AI를 1차 독자로 가정하고 다시 설계해야 한다.</p>
+    <p>마크다운(.md)은 이 시대의 문법이다. 가벼우며, 버전 관리가 되고, diff가 명확하며, 어떤 LLM이든 토큰 낭비 없이 정확하게 파싱한다. 문서를 AI에게 던졌을 때 "이거 PPT라 못 읽어요" 같은 대답이 돌아오지 않는다.</p>
+  </section>
+
+  <section>
+    <div class="section-num">§ 02 — 폐기</div>
+    <h2>PPT를 <em>없앴다.</em></h2>
+    <p>프로덕트를 만드는 데 PPT는 더 이상 필요 없다. AI가 불편해한다는 것이 가장 큰 이유이고, 사실상 PPT가 하던 모든 역할은 더 나은 대체재가 있다.</p>
+
+    <ol class="args">
+      <li>
+        <b>프리젠테이션이 필요하면?</b>
+        HTML로 더 멋지게 만든다. 애니메이션, 인터랙션, 반응형 — 슬라이드보다 100배 풍부하고 100배 가볍다. 이 문서가 바로 그 증거다.
+      </li>
+      <li>
+        <b>화면 기획서?</b>
+        PPT로 박스 그리는 건 구시대적이다. 잘 정의된 PRD, FRD, UI/UX 명세, 디자인 시스템 .md 파일이면 AI와 작업하기에 충분하다. 오히려 더 정확하다.
+      </li>
+      <li>
+        <b>와이어프레임?</b>
+        와이어 그릴 시간에 디자인된 화면을 보여주는 시대다. Figma, v0, Claude 아티팩트 — 흑백 박스는 끝났다.
+      </li>
+      <li>
+        <b>클라이언트가 PPT를 주면?</b>
+        받는 즉시 .md로 추출한다. 추출도 AI에게 시킨다. 원본 PPT는 아카이브로 들어가고, 모든 작업은 .md 위에서 이루어진다.
+      </li>
+    </ol>
+  </section>
+
+  <div class="pull">"내가 읽기 편한 문서가 아니라,<br><span>AI가 작업하기 편한 문서</span>를 만든다."</div>
+
+  <section>
+    <div class="section-num">§ 03 — 비교</div>
+    <h2>구시대 vs <em>새 질서</em></h2>
+
+    <div class="compare">
+      <div class="old">
+        <h3>Before · 2015 office</h3>
+        <ul>
+          <li>제안서.pptx</li>
+          <li>화면기획서_v17_최종_진짜최종.pptx</li>
+          <li>와이어프레임.pptx</li>
+          <li>요구사항정의서.docx</li>
+          <li>회의록.hwp</li>
+          <li>"이 PPT 좀 정리해줘"</li>
+        </ul>
+      </div>
+      <div class="new">
+        <h3>After · 2026 ai-native</h3>
+        <ul>
+          <li>proposal.md</li>
+          <li>prd.md + frd.md</li>
+          <li>design-system.md</li>
+          <li>requirements.md</li>
+          <li>meeting-notes.md</li>
+          <li>"이 .md 좀 리팩토링해줘"</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-num">§ 04 — 예시</div>
+    <h2>그래서 <em>어떻게 생겼나.</em></h2>
+    <p>말로만 하면 추상적이다. 실제 .md 파일이 어떻게 생겼는지 세 가지 예시를 본다. PRD, 디자인 시스템, 그리고 PPT에서 추출한 문서.</p>
+
+    <div class="example">
+      <div class="example-label"><span class="tag">예시 01</span> prd.md — 제품 요구사항 정의서</div>
+<pre><code><span class="h"># DoctorBrand 견적 계산기 PRD</span>
+
+<span class="h">## 1. 목적</span>
+병원 원장이 3분 안에 자기 병원에 맞는 패키지 견적을
+산출하고, 자동으로 BX 설문 폼으로 연결되도록 한다.
+
+<span class="h">## 2. 사용자 시나리오</span>
+- <span class="b">Primary user</span>: 1인 의원 개원의 (40~55세)
+- <span class="b">Trigger</span>: 네이버 검색 → doctorbrand.kr 랜딩 진입
+- <span class="b">Goal</span>: 가격대 확인 후 상담 신청
+
+<span class="h">## 3. 기능 요구사항</span>
+1. 진료과 선택 (드롭다운, 14개 옵션)
+2. 페이지 수 입력 (5 / 10 / 15+)
+3. 옵션 토글 (예약 시스템, 다국어, 블로그)
+4. 실시간 견적 계산 → 합계 표시
+5. <span class="k">"상담 신청"</span> 버튼 → BX 설문 폼 이동
+
+<span class="h">## 4. 비기능 요구사항</span>
+- 모바일 First (375px 기준 설계)
+- LCP &lt; 1.5s
+- 의료광고법 §56 준수 문구 푸터 고정
+</code></pre>
+    </div>
+
+    <div class="example">
+      <div class="example-label"><span class="tag">예시 02</span> design-system.md — 디자인 시스템</div>
+<pre><code><span class="h"># DoctorBrand Design System v2</span>
+
+<span class="h">## Color Tokens</span>
+| Token            | Hex       | 용도              |
+|------------------|-----------|------------------|
+| <span class="b">--ink</span>            | #0F1A2B   | 본문 텍스트       |
+| <span class="b">--paper</span>          | #FAFAF7   | 배경              |
+| <span class="b">--accent-medical</span> | #1B6FB8   | CTA, 링크         |
+| <span class="b">--alert</span>          | #C84B31   | 경고, 의료광고법  |
+
+<span class="h">## Typography</span>
+- <span class="b">Display</span>: Pretendard Variable, 700, -0.02em
+- <span class="b">Body</span>: Pretendard Variable, 400, 1.7
+- 본문 최소 16px, 모바일 17px
+
+<span class="h">## Spacing Scale</span>
+<span class="c">// 4px base, 1.5x ratio</span>
+4 · 8 · 12 · 16 · 24 · 32 · 48 · 72 · 108
+</code></pre>
+    </div>
+
+    <div class="example">
+      <div class="example-label"><span class="tag">예시 03</span> client-deck-extracted.md — 클라이언트 PPT 추출본</div>
+<pre><code><span class="h"># [추출] OO병원 리뉴얼 제안서</span>
+<span class="c">&gt; 원본: OO병원_리뉴얼제안_v3.pptx (32 slides)</span>
+<span class="c">&gt; 추출일: 2026-04-07 / 추출: Claude</span>
+
+<span class="h">## Slide 01 — 표지</span>
+OO병원 웹사이트 리뉴얼 제안
+2026.03 / 담당: 김OO 실장
+
+<span class="h">## Slide 04 — 현황 진단</span>
+- 현재 사이트: 2018년 제작, 모바일 미대응
+- 월 방문자: 약 1,200명 (네이버 검색 70%)
+- 이탈률: 78% (모바일 92%)
+- <span class="b">핵심 문제</span>: 진료 예약 동선 부재
+
+<span class="h">## Slide 12 — 요구 기능</span>
+1. 카카오톡 예약 연동
+2. 의료진 소개 페이지 (5명)
+3. 진료 후기 (의료법 준수 처리)
+4. 블로그 / 공지사항
+
+<span class="h">## Slide 28 — 일정</span>
+- W1~2: 기획 / 와이어
+- W3~5: 디자인
+- W6~8: 개발 / 런칭
+</code></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-num">§ 05 — 실행</div>
+    <h2>오늘부터 <em>이렇게 한다.</em></h2>
+    <ol class="args">
+      <li><b>모든 신규 문서는 .md로 시작한다.</b> 표지도, 목차도, 페이지 번호도 필요 없다. 헤딩 레벨이 곧 구조다.</li>
+      <li><b>레거시 .pptx / .docx / .hwp는 받는 즉시 .md로 추출한다.</b> 추출은 AI에게 맡긴다. 원본은 archive/ 폴더로 격리.</li>
+      <li><b>발표가 필요하면 HTML 아티팩트로 만든다.</b> 클라이언트 미팅, 사내 공유, 외부 강연 — 전부 HTML이 PPT보다 낫다.</li>
+      <li><b>문서는 Git으로 관리한다.</b> 버전 관리는 파일명_최종_v17이 아니라 commit hash로 한다.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <div class="sig">— Editorial Board</div>
+    <div>doctormodu · doctorbrand · doctornote · doctorlounge</div>
+  </footer>
+
+</div>
+</body>
+</html>
